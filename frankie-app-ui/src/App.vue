@@ -1,5 +1,26 @@
-<script setup lang="ts"></script>
+<script lang="ts">
+import EventButtons from "./components/EventButtons.vue";
+import Stats from "./components/Stats.vue";
 
-<template></template>
+export default {
+  components: {
+    EventButtons,
+    Stats,
+  },
+};
+</script>
 
-<style scoped></style>
+<template>
+  <main>
+    <Stats />
+    <EventButtons />
+  </main>
+</template>
+
+<style scoped>
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+</style>
