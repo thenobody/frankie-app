@@ -1,25 +1,23 @@
 <script lang="ts">
-import type { Record } from "@/utils/records";
 import records from "@/utils/records";
-import _ from "lodash-es";
-import { format, formatISO } from "date-fns";
+import { format } from "date-fns";
 
 export default {
   computed: {
-    mostRecent(): Map<String, String> {
-      const result: Map<String, String> = new Map();
-      records.entities.forEach((times: Array<number>, kind: String) => {
-        if (times.length > 0) {
-          const date = format(times[times.length - 1], "ppp");
+    mostRecent(): Map<string, string> {
+      const result: Map<string, string> = new Map();
+      records.mostRecents.forEach((time: number, kind: string) => {
+        if (time > -1) {
+          const date = format(time, "ppp");
           result.set(kind, date);
         }
       });
       return result;
     },
-    counts(): Map<String, number> {
-      const result: Map<String, number> = new Map();
-      records.entities.forEach((times: Array<number>, kind: String) => {
-        if (times.length > 0) result.set(kind, times.length);
+    counts(): Map<string, number> {
+      const result: Map<string, number> = new Map();
+      records.counts.forEach((count: number, kind: string) => {
+        if (count > 0) result.set(kind, count);
       });
       return result;
     },

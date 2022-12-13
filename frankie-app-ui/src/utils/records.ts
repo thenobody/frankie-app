@@ -1,23 +1,14 @@
 import { reactive } from "vue";
-import _ from "lodash-es";
-
-export interface Record {
-  kind: string;
-  time: number;
-}
 
 export default reactive({
-  entities: new Map<String, Array<number>>(),
-  addKind(kind: string, time: number = _.now()) {
-    const times = this.entities.get(kind);
-    if (typeof times !== "undefined") {
-      times.push(time);
-    } else this.entities.set(kind, [time]);
+  mostRecents: new Map<string, number>(),
+  counts: new Map<string, number>(),
+
+  setMostRecent(kind: string, mostRecent: number): void {
+    this.mostRecents.set(kind, mostRecent);
   },
-  dropLast(kind: string) {
-    const times = this.entities.get(kind);
-    if (typeof times !== "undefined") {
-      times.pop();
-    }
+
+  setCount(kind: string, count: number): void {
+    this.counts.set(kind, count);
   },
 });

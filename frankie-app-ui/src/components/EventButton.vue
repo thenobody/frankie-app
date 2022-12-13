@@ -1,5 +1,7 @@
 <script lang="ts">
-import records from "../utils/records";
+import type EventService from "@/api/EventService";
+import { EventServiceKey } from "@/InjectionKeys";
+import records from "@/utils/records";
 
 export default {
   props: {
@@ -13,13 +15,26 @@ export default {
     },
   },
   methods: {
+    async updateRecords() {
+      const { mostRecent } = await this.eventService.getMostRecentByKind(
+        this.kind
+      );
+      records.setMostRecent(this.kind, mostRecent);
+      const { count } = await this.eventService.getCountByKind(this.kind);
+      records.setCount(this.kind, count);
+    },
     handleClick() {
-      records.addKind(this.kind);
+      this.eventService
+        .addMostRecent(this.kind)
+        .then(() => this.updateRecords());
     },
     handleUndo() {
-      records.dropLast(this.kind);
+      this.eventService
+        .dropMostRecent(this.kind)
+        .then(() => this.updateRecords());
     },
   },
+  inject: { eventService: { from: EventServiceKey } },
 };
 </script>
 
