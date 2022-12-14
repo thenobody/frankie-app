@@ -14,6 +14,9 @@ export default {
       default: "#ababab",
     },
   },
+  created() {
+    this.updateRecords();
+  },
   methods: {
     async updateRecords() {
       const { mostRecent } = await this.eventService.getMostRecentByKind(

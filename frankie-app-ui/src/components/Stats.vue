@@ -8,7 +8,7 @@ export default {
       const result: Map<string, string> = new Map();
       records.mostRecents.forEach((time: number, kind: string) => {
         if (time > -1) {
-          const date = format(time, "ppp");
+          const date = format(time, "p");
           result.set(kind, date);
         }
       });

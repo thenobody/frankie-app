@@ -15,56 +15,87 @@ app
     .use(body_parser_1.default.json());
 const port = 3000;
 const store = new Map();
+const log = [];
+function printLog(message) {
+    const timestamp = new Date(lodash_1.default.now()).toISOString();
+    console.log(`${timestamp}: ${message}`);
+}
+function getLog(limit) {
+    return typeof limit !== "undefined" ? log.slice(0, limit) : log;
+}
 function getMostRecent(kind) {
     const times = store.get(kind);
     if (typeof times !== "undefined" && times.length > 0) {
         return times[times.length - 1];
     }
 }
-function getCount(kind) {
+function getCount(kind, after) {
     const times = store.get(kind);
     if (typeof times !== "undefined") {
-        return times.length;
+        if (typeof after !== "undefined") {
+            let count = 0;
+            times.forEach((time) => {
+                if (time >= after)
+                    count++;
+            });
+            return count;
+        }
+        else
+            return times.length;
     }
 }
-function addMostRecent(kind, time) {
+function addMostRecent(kind) {
+    const entry = { kind: kind, time: lodash_1.default.now() };
     const times = store.get(kind);
     if (typeof times !== "undefined") {
-        times.push(lodash_1.default.now());
+        times.push(entry.time);
     }
     else {
-        store.set(kind, [lodash_1.default.now()]);
+        store.set(kind, [entry.time]);
     }
+    log.unshift(entry);
 }
 function dropMostRecent(kind) {
     const times = store.get(kind);
     if (typeof times !== "undefined") {
         times.pop();
     }
+    const lastIndex = lodash_1.default.findIndex(log, (entry) => kind === entry.kind);
+    if (lastIndex > -1) {
+        log.splice(lastIndex, 1);
+    }
 }
+app.get("/events", (req, res) => {
+    printLog(`getLog()`);
+    res.json({
+        log: getLog(),
+    });
+});
 app.get("/events/:kind/most-recent", (req, res) => {
-    console.log(`getMostRecent(${req.params.kind})`);
-    res.send(JSON.stringify({
+    printLog(`getMostRecent(${req.params.kind})`);
+    res.json({
         mostRecent: getMostRecent(req.params.kind),
-    }));
+    });
 });
 app.get("/events/:kind/count", (req, res) => {
-    console.log(`getCount(${req.params.kind})`);
-    res.send(JSON.stringify({
-        count: getCount(req.params.kind),
-    }));
+    const kind = req.params.kind;
+    const after = typeof req.query.after === "string" ? parseInt(req.query.after) : undefined;
+    printLog(`getCount(${kind}, ${after})`);
+    res.json({
+        count: getCount(kind, after),
+    });
 });
 app.delete("/events/:kind/most-recent", (req, res) => {
-    console.log(`dropMostRecent(${req.params.kind})`);
+    printLog(`dropMostRecent(${req.params.kind})`);
     dropMostRecent(req.params.kind);
     res.sendStatus(200);
 });
 app.post("/events/:kind/most-recent", (req, res) => {
-    console.log(`addMostRecent(${req.params.kind}, ${req.body.mostRecent})`);
-    addMostRecent(req.params.kind, req.body.mostRecent);
+    printLog(`addMostRecent(${req.params.kind})`);
+    addMostRecent(req.params.kind);
     res.sendStatus(200);
 });
 app.listen(port, () => {
-    return console.log(`Express is listening at http://localhost:${port}`);
+    return printLog(`Express is listening at http://localhost:${port}`);
 });
 //# sourceMappingURL=app.js.map

@@ -6,5 +6,8 @@ import { EventServiceKey } from "./InjectionKeys";
 import "./assets/main.css";
 
 createApp(App)
-  .provide(EventServiceKey, new EventService(new URL("http://localhost:3000")))
+  .provide(
+    EventServiceKey,
+    new EventService(new URL("http://vancos-imac.local:3000"))
+  )
   .mount("#app");
