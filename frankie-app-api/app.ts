@@ -26,6 +26,13 @@ function getLog(limit?: number): { kind: string; time: number }[] {
   return typeof limit !== "undefined" ? log.slice(0, limit) : log;
 }
 
+function dropAll(): void {
+  store.clear();
+  while (log.length) {
+    log.pop();
+  }
+}
+
 function getMostRecent(kind: string): number {
   const times = store.get(kind);
   if (typeof times !== "undefined" && times.length > 0) {
@@ -76,6 +83,12 @@ app.get("/events", (req, res) => {
   res.json({
     log: getLog(),
   });
+});
+
+app.delete("/events/", (req, res) => {
+  printLog(`dropAll()`);
+  dropAll();
+  res.sendStatus(200);
 });
 
 app.get("/events/:kind/most-recent", (req, res) => {

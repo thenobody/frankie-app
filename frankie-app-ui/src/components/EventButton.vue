@@ -25,6 +25,8 @@ export default {
       records.setMostRecent(this.kind, mostRecent);
       const { count } = await this.eventService.getCountByKind(this.kind);
       records.setCount(this.kind, count);
+      const { log } = await this.eventService.getLog();
+      records.setLog(log);
     },
     handleClick() {
       this.eventService
@@ -56,7 +58,6 @@ export default {
   width: 200px;
   height: 200px;
   color: v-bind(color);
-  /* color: #ababab; */
   cursor: pointer;
   font-size: 1.2em;
   display: flex;
@@ -66,7 +67,6 @@ export default {
 }
 
 .event-button:hover {
-  /* border: 1px solid #ababab; */
   background-color: #404040;
 }
 

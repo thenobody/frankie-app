@@ -1,10 +1,12 @@
 <script lang="ts">
 import EventButtons from "./components/EventButtons.vue";
+import Log from "./components/Log.vue";
 import Stats from "./components/Stats.vue";
 
 export default {
   components: {
     EventButtons,
+    Log,
     Stats,
   },
 };
@@ -12,6 +14,7 @@ export default {
 
 <template>
   <main>
+    <Log />
     <Stats />
     <EventButtons />
   </main>

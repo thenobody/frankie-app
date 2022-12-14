@@ -10,8 +10,13 @@ export default class {
     this.host = host;
   }
 
-  async getAll(): Promise<AllResponse> {
-    return await fetch(this.host + "events")
+  async getLog(limit?: number): Promise<AllResponse> {
+    const params: Record<string, string> = {};
+    if (typeof limit !== "undefined") {
+      params.limit = limit.toString();
+    }
+    const query = new URLSearchParams(params);
+    return await fetch(this.host + "events?" + query)
       .then((res) => res.json())
       .then((json: AllResponse) => json);
   }
