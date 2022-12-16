@@ -1,7 +1,6 @@
+import { EventTypes } from "@/model/EventType";
+import records from "@/utils/records";
 import _ from "lodash-es";
-
-type KindResponse = { kind: string; times: number[] };
-type AllResponse = [KindResponse];
 
 export default class {
   readonly host: URL;
@@ -10,7 +9,7 @@ export default class {
     this.host = host;
   }
 
-  async getLog(limit?: number): Promise<AllResponse> {
+  async getLog(limit?: number): Promise<{ kind: string; time: number }[]> {
     const params: Record<string, string> = {};
     if (typeof limit !== "undefined") {
       params.limit = limit.toString();
@@ -18,7 +17,7 @@ export default class {
     const query = new URLSearchParams(params);
     return await fetch(this.host + "events?" + query)
       .then((res) => res.json())
-      .then((json: AllResponse) => json);
+      .then(({ log }) => log as { kind: string; time: number }[]);
   }
 
   async getMostRecent(): Promise<{ kind: string; mostRecent: number }[]> {
@@ -53,7 +52,7 @@ export default class {
     return await fetch(
       this.host + `events/${kind}/most-recent`,
       requestOptions
-    ).then(() => new Promise((resolve) => resolve()));
+    ).then(() => this.updateRecords());
   }
 
   async dropMostRecent(kind: string): Promise<void> {
@@ -64,6 +63,22 @@ export default class {
     return await fetch(
       this.host + `events/${kind}/most-recent`,
       requestOptions
-    ).then(() => new Promise((resolve) => resolve()));
+    ).then(() => this.updateRecords());
+  }
+
+  async updateRecords(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      EventTypes.forEach(async ({ kind }) => {
+        const { mostRecent } = await this.getMostRecentByKind(kind);
+        records.setMostRecent(kind, mostRecent);
+
+        const { count } = await this.getCountByKind(kind);
+        records.setCount(kind, count);
+
+        const log = await this.getLog();
+        records.setLog(log);
+      });
+      resolve();
+    });
   }
 }

@@ -2,8 +2,16 @@
 import EventButtons from "./components/EventButtons.vue";
 import Log from "./components/Log.vue";
 import Stats from "./components/Stats.vue";
+import { EventServiceKey } from "./InjectionKeys";
 
 export default {
+  created() {
+    this.eventService.updateRecords();
+    setInterval(() => {
+      this.eventService.updateRecords();
+    }, 30 * 1000);
+  },
+  inject: { eventService: { from: EventServiceKey } },
   components: {
     EventButtons,
     Log,

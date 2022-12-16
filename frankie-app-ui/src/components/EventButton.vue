@@ -22,34 +22,19 @@ export default {
       default: "#ababab",
     },
   },
-  created() {
-    this.updateRecords();
-  },
   computed: {
     text() {
       return `${this.icon} ${this.label}`;
     },
   },
   methods: {
-    async updateRecords() {
-      const { mostRecent } = await this.eventService.getMostRecentByKind(
-        this.kind
-      );
-      records.setMostRecent(this.kind, mostRecent);
-      const { count } = await this.eventService.getCountByKind(this.kind);
-      records.setCount(this.kind, count);
-      const { log } = await this.eventService.getLog();
-      records.setLog(log);
-    },
     handleClick() {
-      this.eventService
-        .addMostRecent(this.kind)
-        .then(() => this.updateRecords());
+      this.eventService.addMostRecent(this.kind);
+      // .then(() => this.updateRecords());
     },
     handleUndo() {
-      this.eventService
-        .dropMostRecent(this.kind)
-        .then(() => this.updateRecords());
+      this.eventService.dropMostRecent(this.kind);
+      // .then(() => this.updateRecords());
     },
   },
   inject: { eventService: { from: EventServiceKey } },

@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { reactive, toHandlers } from "vue";
 
 export default reactive({
   mostRecents: new Map<string, number>(),
@@ -15,5 +15,6 @@ export default reactive({
 
   setLog(log: { kind: string; time: number }[]): void {
     this.log = log;
+    // this.log.push(...log);
   },
 });

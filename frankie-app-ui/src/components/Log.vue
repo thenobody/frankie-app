@@ -1,4 +1,5 @@
 <script lang="ts">
+import { EventServiceKey } from "@/InjectionKeys";
 import records from "@/utils/records";
 import { format } from "date-fns";
 
