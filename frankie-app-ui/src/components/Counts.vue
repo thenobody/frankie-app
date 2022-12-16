@@ -1,12 +1,17 @@
 <script lang="ts">
+import { getEventTypeByKind, type EventType } from "@/model/EventType";
 import records from "@/utils/records";
 
 export default {
   computed: {
-    counts(): Map<string, number> {
-      const result: Map<string, number> = new Map();
+    counts(): { eventType: EventType; count: number }[] {
+      const result: { eventType: EventType; count: number }[] = [];
       records.counts.forEach((count: number, kind: string) => {
-        if (count > 0) result.set(kind, count);
+        if (count > 0)
+          result.push({
+            eventType: getEventTypeByKind(kind)!,
+            count: count,
+          });
       });
       return result;
     },
@@ -17,7 +22,9 @@ export default {
 <template>
   <h2>Counts:</h2>
   <ul id="counts">
-    <li v-for="[kind, count] in counts">{{ kind }} x {{ count }}</li>
+    <li v-for="{ eventType, count } in counts">
+      {{ eventType.icon }} x {{ count }}
+    </li>
   </ul>
 </template>
 

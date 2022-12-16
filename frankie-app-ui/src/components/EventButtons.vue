@@ -1,17 +1,10 @@
 <script lang="ts">
+import { EventTypes } from "@/model/EventType";
 import EventButton from "./EventButton.vue";
 export default {
   data() {
     return {
-      buttons: [
-        { kind: "pee", text: "🚽 Pee" },
-        { kind: "poo", text: "🧻 Poo" },
-        { kind: "food", text: "🍗 Food" },
-        { kind: "water", text: "🚰 Water" },
-        { kind: "cooper", text: "🐶 Cooper" },
-        { kind: "wakeup", text: "⏰ Wake up" },
-        { kind: "sleep", text: "🛏️ Sleep" },
-      ],
+      buttons: [...EventTypes],
     };
   },
   components: {
@@ -22,9 +15,13 @@ export default {
 
 <template>
   <div id="event-buttons">
-    <EventButton v-for="button in buttons" :kind="button.kind">{{
-      button.text
-    }}</EventButton>
+    <EventButton
+      v-for="button in buttons"
+      :kind="button.kind"
+      :icon="button.icon"
+      :label="button.label"
+      :key="button.kind"
+    />
   </div>
 </template>
 

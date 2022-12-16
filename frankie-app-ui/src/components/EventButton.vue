@@ -9,6 +9,14 @@ export default {
       type: String,
       required: true,
     },
+    label: {
+      type: String,
+      required: true,
+    },
+    icon: {
+      type: String,
+      required: true,
+    },
     color: {
       type: String,
       default: "#ababab",
@@ -16,6 +24,11 @@ export default {
   },
   created() {
     this.updateRecords();
+  },
+  computed: {
+    text() {
+      return `${this.icon} ${this.label}`;
+    },
   },
   methods: {
     async updateRecords() {
@@ -45,7 +58,7 @@ export default {
 
 <template>
   <div class="event-button" @click="handleClick">
-    <slot />
+    {{ text }}
     <button class="undo" @click.stop="handleUndo">undo</button>
   </div>
 </template>
