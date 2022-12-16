@@ -33,7 +33,22 @@ function dropAll(): void {
   }
 }
 
-function getMostRecent(kind: string): number {
+function getMostRecent(): { kind: string; mostRecent: number }[] {
+  const result: { kind: string; mostRecent: number }[] = [];
+
+  store.forEach((times, kind) => {
+    if (times.length > 0) {
+      result.push({
+        kind: kind,
+        mostRecent: times[times.length - 1],
+      });
+    }
+  });
+
+  return result;
+}
+
+function getMostRecentByKind(kind: string): number {
   const times = store.get(kind);
   if (typeof times !== "undefined" && times.length > 0) {
     return times[times.length - 1];
@@ -91,10 +106,17 @@ app.delete("/events/", (req, res) => {
   res.sendStatus(200);
 });
 
-app.get("/events/:kind/most-recent", (req, res) => {
-  printLog(`getMostRecent(${req.params.kind})`);
+app.get("/events/most-recent", (req, res) => {
+  printLog(`getMostRecent()`);
   res.json({
-    mostRecent: getMostRecent(req.params.kind),
+    mostRecents: getMostRecent(),
+  });
+});
+
+app.get("/events/:kind/most-recent", (req, res) => {
+  printLog(`getMostRecentByKind(${req.params.kind})`);
+  res.json({
+    mostRecent: getMostRecentByKind(req.params.kind),
   });
 });
 
