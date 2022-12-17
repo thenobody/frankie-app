@@ -7,9 +7,14 @@ import { printLog } from "./utils";
 
 function setupRoutes(app: Express, service: Service): Express {
   app.get("/events", async (req, res) => {
+    const limit =
+      typeof req.query.limit === "string"
+        ? parseInt(req.query.limit)
+        : undefined;
+
     printLog(`getLog()`);
     res.json({
-      log: await service.getLog(),
+      log: await service.getLog(limit),
     });
   });
 

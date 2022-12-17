@@ -48,7 +48,8 @@ export class RedisService implements Service {
   }
 
   async getLog(limit?: number): Promise<{ kind: string; time: number }[]> {
-    const entries = await this.client.lRange(this.keys.log, 0, limit * 2 || -1);
+    const range = limit * 2 - 1 || -1;
+    const entries = await this.client.lRange(this.keys.log, 0, range);
     const result: { kind: string; time: number }[] = [];
     for (let i = 0; i < entries.length; i = i + 2) {
       result.push({
