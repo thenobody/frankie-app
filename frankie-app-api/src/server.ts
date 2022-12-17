@@ -6,34 +6,34 @@ import type { Express } from "express";
 import { printLog } from "./utils";
 
 function setupRoutes(app: Express, service: Service): Express {
-  app.get("/events", (req, res) => {
+  app.get("/events", async (req, res) => {
     printLog(`getLog()`);
     res.json({
-      log: service.getLog(),
+      log: await service.getLog(),
     });
   });
 
-  app.delete("/events/", (req, res) => {
+  app.delete("/events/", async (req, res) => {
     printLog(`dropAll()`);
-    service.dropAll();
+    await service.dropAll();
     res.sendStatus(200);
   });
 
-  app.get("/events/most-recent", (req, res) => {
+  app.get("/events/most-recent", async (req, res) => {
     printLog(`getMostRecent()`);
     res.json({
-      mostRecents: service.getMostRecent(),
+      mostRecents: await service.getMostRecent(),
     });
   });
 
-  app.get("/events/:kind/most-recent", (req, res) => {
+  app.get("/events/:kind/most-recent", async (req, res) => {
     printLog(`getMostRecentByKind(${req.params.kind})`);
     res.json({
-      mostRecent: service.getMostRecentByKind(req.params.kind),
+      mostRecent: await service.getMostRecentByKind(req.params.kind),
     });
   });
 
-  app.get("/events/:kind/count", (req, res) => {
+  app.get("/events/:kind/count", async (req, res) => {
     const kind = req.params.kind;
     const after =
       typeof req.query.after === "string"
@@ -42,19 +42,19 @@ function setupRoutes(app: Express, service: Service): Express {
 
     printLog(`getCount(${kind}, ${after})`);
     res.json({
-      count: service.getCount(kind, after),
+      count: await service.getCount(kind, after),
     });
   });
 
-  app.delete("/events/:kind/most-recent", (req, res) => {
+  app.delete("/events/:kind/most-recent", async (req, res) => {
     printLog(`dropMostRecent(${req.params.kind})`);
-    service.dropMostRecent(req.params.kind);
+    await service.dropMostRecent(req.params.kind);
     res.sendStatus(200);
   });
 
-  app.post("/events/:kind/most-recent", (req, res) => {
+  app.post("/events/:kind/most-recent", async (req, res) => {
     printLog(`addMostRecent(${req.params.kind})`);
-    service.addMostRecent(req.params.kind);
+    await service.addMostRecent(req.params.kind);
     res.sendStatus(200);
   });
 
