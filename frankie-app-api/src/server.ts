@@ -38,6 +38,18 @@ function setupRoutes(app: Express, service: Service): Express {
     });
   });
 
+  app.get("/events/count", async (req, res) => {
+    const after =
+      typeof req.query.after === "string"
+        ? parseInt(req.query.after)
+        : undefined;
+
+    printLog(`getCounts(${after})`);
+    res.json({
+      counts: await service.getCounts(after),
+    });
+  });
+
   app.get("/events/:kind/count", async (req, res) => {
     const kind = req.params.kind;
     const after =

@@ -12,6 +12,7 @@ export interface Service {
   dropAll(): Promise<void>;
   getMostRecent(): Promise<{ kind: string; mostRecent: number }[]>;
   getMostRecentByKind(kind: string): Promise<number>;
+  getCounts(after?: number): Promise<{ kind: string; count: number }[]>;
   getCount(kind: string, after?: number): Promise<number>;
   addMostRecent(kind: string): Promise<void>;
   dropMostRecent(kind: string): Promise<void>;
@@ -20,10 +21,11 @@ export interface Service {
 export class RedisService implements Service {
   private client: RedisClientType<RedisModules, RedisFunctions, RedisScripts>;
 
+  private readonly kindPrefix: string = "kind_";
+
   private keys = {
     log: "log",
-    kind: (kind: string) => `kind_${kind}`,
-    kinds: `kind_*`,
+    kind: (kind: string) => `${this.kindPrefix}${kind}`,
   };
 
   constructor() {
@@ -47,6 +49,11 @@ export class RedisService implements Service {
     await transaction.exec();
   }
 
+  private async getKinds(): Promise<string[]> {
+    const keys = await this.client.keys(this.keys.kind("*"));
+    return keys.map((key) => key.replace(this.kindPrefix, ""));
+  }
+
   async getLog(limit?: number): Promise<{ kind: string; time: number }[]> {
     const range = limit * 2 - 1 || -1;
     const entries = await this.client.lRange(this.keys.log, 0, range);
@@ -65,7 +72,7 @@ export class RedisService implements Service {
   }
 
   async getMostRecent(): Promise<{ kind: string; mostRecent: number }[]> {
-    const kinds = await this.client.keys(this.keys.kinds);
+    const kinds = await this.getKinds();
     const results = kinds.map(async (kind) => {
       const mostRecent = await this.getMostRecentByKind(kind);
       return { kind: kind, mostRecent: mostRecent };
@@ -76,6 +83,15 @@ export class RedisService implements Service {
   async getMostRecentByKind(kind: string): Promise<number> {
     const result = await this.client.lIndex(this.keys.kind(kind), 0);
     return result ? parseInt(result) : 0;
+  }
+
+  async getCounts(after?: number): Promise<{ kind: string; count: number }[]> {
+    const kinds = await this.getKinds();
+    const results = kinds.map(async (kind) => {
+      const count = await this.getCount(kind, after);
+      return { kind: kind, count: count };
+    });
+    return Promise.all(results);
   }
 
   getCount(kind: string, after?: number): Promise<number> {
@@ -91,88 +107,5 @@ export class RedisService implements Service {
   async dropMostRecent(kind: string): Promise<void> {
     await this.client.lPop(this.keys.kind(kind));
     await this.dropLogEntry(kind);
-  }
-}
-
-export class SimpleService implements Service {
-  private store = new Map<string, number[]>();
-  private log: { kind: string; time: number }[] = [];
-
-  getLog(limit?: number): Promise<{ kind: string; time: number }[]> {
-    const result =
-      typeof limit !== "undefined" ? this.log.slice(0, limit) : this.log;
-    return Promise.resolve(result);
-  }
-
-  dropAll(): Promise<void> {
-    this.store.clear();
-    while (this.log.length) {
-      this.log.pop();
-    }
-    return Promise.resolve();
-  }
-
-  getMostRecent(): Promise<{ kind: string; mostRecent: number }[]> {
-    const result: { kind: string; mostRecent: number }[] = [];
-
-    this.store.forEach((times, kind) => {
-      if (times.length > 0) {
-        result.push({
-          kind: kind,
-          mostRecent: times[times.length - 1],
-        });
-      }
-    });
-
-    return Promise.resolve(result);
-  }
-
-  getMostRecentByKind(kind: string): Promise<number> {
-    const times = this.store.get(kind);
-    if (typeof times !== "undefined" && times.length > 0) {
-      return Promise.resolve(times[times.length - 1]);
-    }
-  }
-
-  getCount(kind: string, after?: number): Promise<number> {
-    const times = this.store.get(kind);
-    if (typeof times !== "undefined") {
-      if (typeof after !== "undefined") {
-        let count = 0;
-        times.forEach((time) => {
-          if (time >= after) count++;
-        });
-        return Promise.resolve(count);
-      } else return Promise.resolve(times.length);
-    }
-  }
-
-  addMostRecent(kind: string): Promise<void> {
-    const entry = { kind: kind, time: _.now() };
-
-    const times = this.store.get(kind);
-    if (typeof times !== "undefined") {
-      times.push(entry.time);
-    } else {
-      this.store.set(kind, [entry.time]);
-    }
-
-    this.log.unshift(entry);
-
-    return Promise.resolve();
-  }
-
-  dropMostRecent(kind: string): Promise<void> {
-    const times = this.store.get(kind);
-    if (typeof times !== "undefined") {
-      times.pop();
-    }
-
-    const lastIndex = _.findIndex(this.log, (entry) => kind === entry.kind);
-    if (lastIndex > -1) {
-      this.log.splice(lastIndex, 1);
-    }
-
-    return Promise.resolve();
   }
 }
