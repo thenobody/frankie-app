@@ -15,6 +15,5 @@ export default reactive({
 
   setLog(log: { kind: string; time: number }[]): void {
     this.log = log;
-    // this.log.push(...log);
   },
 });
