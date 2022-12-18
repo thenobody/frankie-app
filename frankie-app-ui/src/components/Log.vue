@@ -11,10 +11,13 @@ export default {
       default: 5,
     },
   },
+  created() {
+    records.setLogLimit(this.limit);
+  },
   computed: {
     entries(): { kind: string; timestamp: string }[] {
       const result: { kind: string; timestamp: string }[] = [];
-      records.log.slice(0, this.limit).forEach(({ kind, time }) => {
+      records.log.forEach(({ kind, time }) => {
         result.push({
           kind: kind,
           timestamp: format(time, "p"),

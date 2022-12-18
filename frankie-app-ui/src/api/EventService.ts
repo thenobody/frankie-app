@@ -2,20 +2,28 @@ import { EventTypes } from "@/model/EventType";
 import records from "@/utils/records";
 import _ from "lodash-es";
 
-export default class {
+export default class ExportService {
   readonly host: URL;
 
   constructor(host: URL) {
     this.host = host;
   }
 
-  async getLog(limit?: number): Promise<{ kind: string; time: number }[]> {
-    const params: Record<string, string> = {};
+  async getLog(
+    limit?: number,
+    after?: number
+  ): Promise<{ kind: string; time: number }[]> {
+    const query = new URLSearchParams();
     if (typeof limit !== "undefined") {
-      params.limit = limit.toString();
+      query.set("limit", limit.toString());
     }
-    const query = new URLSearchParams(params);
-    return await fetch(this.host + "events?" + query)
+    if (typeof after !== "undefined") {
+      query.set("after", after.toString());
+    }
+
+    const url = new URL(this.host + "events");
+    url.search = query.toString();
+    return await fetch(url)
       .then((res) => res.json())
       .then(({ log }) => log as { kind: string; time: number }[]);
   }
@@ -28,8 +36,16 @@ export default class {
     return mostRecents;
   }
 
-  async getCounts(): Promise<{ kind: string; count: number }[]> {
-    const res = await fetch(this.host + "events/count");
+  async getCounts(after?: number): Promise<{ kind: string; count: number }[]> {
+    const query = new URLSearchParams();
+    if (typeof after !== "undefined") {
+      query.set("after", after.toString());
+    }
+
+    const url = new URL(this.host + "events/count");
+    url.search = query.toString();
+
+    const res = await fetch(url);
     const { counts } = (await res.json()) as {
       counts: { kind: string; count: number }[];
     };
@@ -62,10 +78,10 @@ export default class {
     mostRecents.forEach(({ kind, mostRecent }) =>
       records.setMostRecent(kind, mostRecent)
     );
-    const counts = await this.getCounts();
+    const counts = await this.getCounts(records.after);
     counts.forEach(({ kind, count }) => records.setCount(kind, count));
 
-    const log = await this.getLog();
+    const log = await this.getLog(records.logLimit, records.after);
     records.setLog(log);
   }
 }
