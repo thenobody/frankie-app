@@ -1,4 +1,4 @@
-import _, { create } from "lodash";
+import _ from "lodash";
 import {
   createClient,
   RedisClientType,
@@ -45,7 +45,7 @@ export class RedisService implements Service {
 
   private async dropLogEntry(kind: string): Promise<void> {
     const index = await this.client.lPos(this.keys.log, kind);
-    const transaction = await this.client.multi();
+    const transaction = this.client.multi();
     await this.client.lSet(this.keys.log, index, "DELETE");
     await this.client.lSet(this.keys.log, index + 1, "DELETE");
     await this.client.lRem(this.keys.log, 0, "DELETE");
@@ -93,8 +93,10 @@ export class RedisService implements Service {
   }
 
   async getMostRecentByKind(kind: string): Promise<number> {
-    const result = await this.client.lIndex(this.keys.kind(kind), 0);
-    return result ? parseInt(result) : 0;
+    const result = await this.client.zRange(this.keys.kind(kind), 0, 0, {
+      REV: true,
+    });
+    return result.length ? parseInt(result.pop()) : 0;
   }
 
   async getCounts(after?: number): Promise<{ kind: string; count: number }[]> {
@@ -106,18 +108,23 @@ export class RedisService implements Service {
     return Promise.all(results);
   }
 
-  getCount(kind: string, after?: number): Promise<number> {
-    return this.client.lLen(this.keys.kind(kind));
+  async getCount(kind: string, after?: number): Promise<number> {
+    if (typeof after !== "undefined") {
+      return this.client.zCount(this.keys.kind(kind), after, "+inf");
+    } else return this.client.zCard(this.keys.kind(kind));
   }
 
   async addMostRecent(kind: string): Promise<void> {
     const time = _.now();
-    await this.client.lPush(this.keys.kind(kind), time.toString());
+    await this.client.zAdd(this.keys.kind(kind), {
+      score: time,
+      value: time.toString(),
+    });
     await this.addLogEntry(kind, time);
   }
 
   async dropMostRecent(kind: string): Promise<void> {
-    await this.client.lPop(this.keys.kind(kind));
+    await this.client.zPopMax(this.keys.kind(kind));
     await this.dropLogEntry(kind);
   }
 }
