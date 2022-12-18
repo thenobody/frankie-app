@@ -5,16 +5,18 @@ import type { Service } from "./service";
 import type { Express } from "express";
 import { printLog } from "./utils";
 
+function numberParam(value?: string): number | undefined {
+  return typeof value === "string" ? parseInt(value) : undefined;
+}
+
 function setupRoutes(app: Express, service: Service): Express {
   app.get("/events", async (req, res) => {
-    const limit =
-      typeof req.query.limit === "string"
-        ? parseInt(req.query.limit)
-        : undefined;
+    const limit = numberParam(req.query.limit?.toString());
+    const after = numberParam(req.query.after?.toString());
 
     printLog(`getLog()`);
     res.json({
-      log: await service.getLog(limit),
+      log: await service.getLog(limit, after),
     });
   });
 
@@ -39,10 +41,7 @@ function setupRoutes(app: Express, service: Service): Express {
   });
 
   app.get("/events/count", async (req, res) => {
-    const after =
-      typeof req.query.after === "string"
-        ? parseInt(req.query.after)
-        : undefined;
+    const after = numberParam(req.query.after?.toString());
 
     printLog(`getCounts(${after})`);
     res.json({
@@ -52,10 +51,7 @@ function setupRoutes(app: Express, service: Service): Express {
 
   app.get("/events/:kind/count", async (req, res) => {
     const kind = req.params.kind;
-    const after =
-      typeof req.query.after === "string"
-        ? parseInt(req.query.after)
-        : undefined;
+    const after = numberParam(req.query.after?.toString());
 
     printLog(`getCount(${kind}, ${after})`);
     res.json({

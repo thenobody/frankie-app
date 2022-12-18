@@ -8,7 +8,10 @@ import {
 } from "@redis/client";
 
 export interface Service {
-  getLog(limit?: number): Promise<{ kind: string; time: number }[]>;
+  getLog(
+    limit?: number,
+    after?: number
+  ): Promise<{ kind: string; time: number }[]>;
   dropAll(): Promise<void>;
   getMostRecent(): Promise<{ kind: string; mostRecent: number }[]>;
   getMostRecentByKind(kind: string): Promise<number>;
@@ -54,16 +57,25 @@ export class RedisService implements Service {
     return keys.map((key) => key.replace(this.kindPrefix, ""));
   }
 
-  async getLog(limit?: number): Promise<{ kind: string; time: number }[]> {
+  async getLog(
+    limit?: number,
+    after?: number
+  ): Promise<{ kind: string; time: number }[]> {
     const range = limit * 2 - 1 || -1;
     const entries = await this.client.lRange(this.keys.log, 0, range);
     const result: { kind: string; time: number }[] = [];
     for (let i = 0; i < entries.length; i = i + 2) {
-      result.push({
+      const entry = {
         kind: entries[i],
         time: parseInt(entries[i + 1]),
-      });
+      };
+      if (typeof after !== "undefined") {
+        if (entry.time >= after) result.push(entry);
+      } else {
+        result.push(entry);
+      }
     }
+
     return result;
   }
 
