@@ -1,10 +1,14 @@
 <script lang="ts">
+import Count from "@/components/Count.vue";
 import { getEventTypeByKind, type EventType } from "@/model/EventType";
 import records from "@/utils/records";
 import { format } from "date-fns";
 import config from "@/config";
 
 export default {
+  components: {
+    Count,
+  },
   computed: {
     counts(): { eventType: EventType; count: number; mostRecent: string }[] {
       const result: {
@@ -33,8 +37,7 @@ export default {
   <h2>Counts:</h2>
   <ul id="counts">
     <li v-for="{ eventType, count, mostRecent } in counts">
-      {{ eventType.icon }} x {{ count }}
-      <span class="mostRecent"> last @ {{ mostRecent }}</span>
+      <Count :event-type="eventType" :count="count" :most-recent="mostRecent" />
     </li>
   </ul>
 </template>
@@ -49,22 +52,6 @@ ul {
 }
 
 li {
-  border: 1px solid #202020;
-  border-radius: 5px;
-  padding: 5px 10px;
-}
-
-li:hover {
-  border-color: #ababab;
-}
-
-.mostRecent {
-  display: none;
-  opacity: 0;
-}
-
-li:hover .mostRecent {
-  display: inline;
-  opacity: 0.5;
+  display: flex;
 }
 </style>

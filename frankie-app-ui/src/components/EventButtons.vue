@@ -31,4 +31,10 @@ export default {
   flex-flow: row wrap;
   gap: 20px;
 }
+
+@media (max-width: 500px) {
+  #event-buttons {
+    justify-content: center;
+  }
+}
 </style>

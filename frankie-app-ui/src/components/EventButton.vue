@@ -60,6 +60,12 @@ export default {
   position: relative;
 }
 
+@media (max-width: 500px) {
+  .event-button {
+    width: 100%;
+  }
+}
+
 .event-button:hover {
   background-color: #404040;
 }
