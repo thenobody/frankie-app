@@ -1,7 +1,5 @@
 <script lang="ts">
-import type EventService from "@/api/EventService";
 import { EventServiceKey } from "@/InjectionKeys";
-import records from "@/utils/records";
 
 export default {
   props: {
@@ -27,17 +25,15 @@ export default {
       return `${this.icon} ${this.label}`;
     },
   },
+  inject: { eventService: { from: EventServiceKey } },
   methods: {
     handleClick() {
       this.eventService.addMostRecent(this.kind);
-      // .then(() => this.updateRecords());
     },
     handleUndo() {
       this.eventService.dropMostRecent(this.kind);
-      // .then(() => this.updateRecords());
     },
   },
-  inject: { eventService: { from: EventServiceKey } },
 };
 </script>
 

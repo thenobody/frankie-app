@@ -21,7 +21,7 @@ export default {
     keepUpdating(): void {
       records.setAfter(startOfDay(_.now()).valueOf());
       this.eventService.updateRecords();
-      setTimeout(this.keepUpdating, 3 * 1000);
+      setTimeout(this.keepUpdating, 30 * 1000);
     },
   },
 };
