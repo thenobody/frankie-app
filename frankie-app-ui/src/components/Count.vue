@@ -29,8 +29,8 @@ export default {
   <span
     class="count"
     :class="{ touched: touched }"
-    @touchstart.stop.prevent="touched = !touched"
-    @touchend.stop.prevent="touched = !touched"
+    @touchstart.prevent="touched = !touched"
+    @touchend.prevent="touched = !touched"
   >
     {{ eventType.icon }} x {{ count }}
     <span class="mostRecent"> last @ {{ mostRecent }}</span>
@@ -63,15 +63,11 @@ export default {
 .count.touched {
   border-color: #ababab;
   background-color: #242424;
-  /* height: 300px; */
   width: 110px;
   position: absolute;
-  /* white-space: nowrap; */
   top: -60px;
   left: -20px;
   text-align: center;
-  /* right: 0; */
-  /* z-index: 1; */
 }
 
 .count.touched .mostRecent {
