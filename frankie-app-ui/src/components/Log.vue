@@ -2,6 +2,7 @@
 import { EventServiceKey } from "@/InjectionKeys";
 import records from "@/utils/records";
 import { format } from "date-fns";
+import config from "@/config";
 
 export default {
   props: {
@@ -20,7 +21,7 @@ export default {
       records.log.forEach(({ kind, time }) => {
         result.push({
           kind: kind,
-          timestamp: format(time, "p"),
+          timestamp: format(time, config.shortDateFormat),
         });
       });
       return result;

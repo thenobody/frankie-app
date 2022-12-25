@@ -1,6 +1,7 @@
 <script lang="ts">
 import records from "@/utils/records";
 import { format } from "date-fns";
+import config from "@/config";
 
 export default {
   computed: {
@@ -8,7 +9,7 @@ export default {
       const result: Map<string, string> = new Map();
       records.mostRecents.forEach((time: number, kind: string) => {
         if (time > -1) {
-          const date = format(time, "p");
+          const date = format(time, config.shortDateFormat);
           result.set(kind, date);
         }
       });

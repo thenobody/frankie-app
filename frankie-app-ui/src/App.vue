@@ -6,8 +6,14 @@ import { EventServiceKey } from "./InjectionKeys";
 import records from "./utils/records";
 import _ from "lodash-es";
 import { startOfDay } from "date-fns";
+import config from "@/config";
 
 export default {
+  data() {
+    return {
+      config: config,
+    };
+  },
   created() {
     this.keepUpdating();
   },
@@ -21,7 +27,7 @@ export default {
     keepUpdating(): void {
       records.setAfter(startOfDay(_.now()).valueOf());
       this.eventService.updateRecords();
-      setTimeout(this.keepUpdating, 30 * 1000);
+      setTimeout(this.keepUpdating, this.config.apiPollIntervalSec * 1000);
     },
   },
 };
@@ -29,7 +35,7 @@ export default {
 
 <template>
   <main>
-    <Log />
+    <Log :limit="config.logEntryCount" />
     <Stats />
     <EventButtons />
   </main>

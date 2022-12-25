@@ -2,6 +2,7 @@
 import { getEventTypeByKind, type EventType } from "@/model/EventType";
 import records from "@/utils/records";
 import { format } from "date-fns";
+import config from "@/config";
 
 export default {
   computed: {
@@ -16,7 +17,10 @@ export default {
           result.push({
             eventType: getEventTypeByKind(kind)!,
             count: count,
-            mostRecent: format(records.mostRecents.get(kind)!, "p"),
+            mostRecent: format(
+              records.mostRecents.get(kind)!,
+              config.shortDateFormat
+            ),
           });
       });
       return result;

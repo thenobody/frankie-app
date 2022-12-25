@@ -2,12 +2,10 @@ import { createApp } from "vue";
 import EventService from "./api/EventService";
 import App from "./App.vue";
 import { EventServiceKey } from "./InjectionKeys";
+import config from "@/config";
 
 import "./assets/main.css";
 
 createApp(App)
-  .provide(
-    EventServiceKey,
-    new EventService(new URL("http://vancos-imac.local:3000"))
-  )
+  .provide(EventServiceKey, new EventService(new URL(config.apiBaseUrl)))
   .mount("#app");
