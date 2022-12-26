@@ -60,23 +60,6 @@ export default {
   position: relative;
 }
 
-@media (max-width: 500px) {
-  .event-button {
-    width: 100%;
-  }
-}
-
-.event-button:hover {
-  background-color: #404040;
-}
-
-.event-button:hover .undo {
-  display: block;
-  opacity: 100%;
-  transition: opacity 0.25s;
-  cursor: pointer;
-}
-
 .undo {
   box-sizing: border-box;
   width: 160px;
@@ -90,7 +73,30 @@ export default {
   border-radius: 5px;
 }
 
-.undo:hover {
-  background-color: #ffffff0d;
+@media (max-width: 500px) {
+  .event-button {
+    width: 100%;
+  }
+
+  .undo {
+    opacity: 1;
+  }
+}
+
+@media (pointer: fine) {
+  .event-button:hover {
+    background-color: #404040;
+  }
+
+  .event-button:hover .undo {
+    display: block;
+    opacity: 100%;
+    transition: opacity 0.25s;
+    cursor: pointer;
+  }
+
+  .undo:hover {
+    background-color: #ffffff0d;
+  }
 }
 </style>

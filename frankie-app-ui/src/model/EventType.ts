@@ -22,6 +22,12 @@ export const CooperEvent: EventType = {
   icon: "🐶",
 };
 
+export const TrainingEvent: EventType = {
+  kind: "training",
+  label: "Training",
+  icon: "🏋️",
+};
+
 export const WakeUpEvent: EventType = {
   kind: "wakeup",
   label: "Wake up",
@@ -40,6 +46,7 @@ export const EventTypes = [
   FoodEvent,
   WaterEvent,
   CooperEvent,
+  TrainingEvent,
   WakeUpEvent,
   SleepEvent,
 ];
