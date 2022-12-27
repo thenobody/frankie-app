@@ -2,22 +2,31 @@
 import EventButtons from "./components/EventButtons.vue";
 import Log from "./components/Log.vue";
 import Stats from "./components/Stats.vue";
-import { EventServiceKey } from "./InjectionKeys";
+import { EventServiceKey, PropertyWindowIsScrollingKey } from "./InjectionKeys";
 import records from "./utils/records";
 import _ from "lodash-es";
 import { startOfDay } from "date-fns";
 import config from "@/config";
+import { computed } from "vue";
 
 export default {
   data() {
     return {
-      config: config,
+      configMap: config,
+      isScrolling: false,
+      scrollTimerId: undefined as number | undefined,
     };
   },
   created() {
     this.keepUpdating();
+    this.watchScrollState();
   },
   inject: { eventService: { from: EventServiceKey } },
+  provide() {
+    return {
+      [PropertyWindowIsScrollingKey]: computed(() => this.isScrolling),
+    };
+  },
   components: {
     EventButtons,
     Log,
@@ -27,7 +36,18 @@ export default {
     keepUpdating(): void {
       records.setAfter(startOfDay(_.now()).valueOf());
       this.eventService.updateRecords();
-      setTimeout(this.keepUpdating, this.config.apiPollIntervalSec * 1000);
+      _.delay(this.keepUpdating, this.configMap.apiPollIntervalSec * 1000);
+    },
+    watchScrollState(): void {
+      ["touchmove", "scroll"].forEach((event) => {
+        window.addEventListener(event, () => {
+          this.isScrolling = true;
+          clearTimeout(this.scrollTimerId);
+          this.scrollTimerId = _.delay(() => {
+            this.isScrolling = false;
+          }, this.configMap.windowScrollCheckMillis);
+        });
+      });
     },
   },
 };
@@ -35,7 +55,7 @@ export default {
 
 <template>
   <main>
-    <Log :limit="config.logEntryCount" />
+    <Log :limit="configMap.logEntryCount" />
     <Stats />
     <EventButtons />
   </main>

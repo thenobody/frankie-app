@@ -6,6 +6,9 @@ import config from "@/config";
 
 import "./assets/main.css";
 
-createApp(App)
+const app = createApp(App);
+app.config.unwrapInjectedRef = true;
+
+app
   .provide(EventServiceKey, new EventService(new URL(config.apiBaseUrl)))
   .mount("#app");
