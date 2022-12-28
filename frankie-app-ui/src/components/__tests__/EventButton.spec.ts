@@ -1,5 +1,3 @@
-// import { describe, it, expect, vi } from "vitest";
-
 import { mount } from "@vue/test-utils";
 import type { EventType } from "@/model/EventType";
 import EventButton from "../EventButton.vue";
