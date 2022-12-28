@@ -77,7 +77,7 @@ export default {
     @touchstart.stop="handleTouchStart"
     @touchend.stop="handleTouchEnd"
   >
-    <span>{{ text }}</span>
+    <span class="full-label">{{ text }}</span>
     <button
       class="undo"
       :class="{ selected: undoSelected }"

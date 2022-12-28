@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import EventService from "./api/EventService";
+import { EventService } from "./api/EventService";
 import App from "./App.vue";
 import { EventServiceKey } from "./InjectionKeys";
 import config from "@/config";

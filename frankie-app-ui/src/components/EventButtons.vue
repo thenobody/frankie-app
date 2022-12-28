@@ -15,13 +15,7 @@ export default {
 
 <template>
   <div id="event-buttons">
-    <EventButton
-      v-for="button in buttons"
-      :kind="button.kind"
-      :icon="button.icon"
-      :label="button.label"
-      :key="button.kind"
-    />
+    <EventButton v-for="button in buttons" v-bind="button" :key="button.kind" />
   </div>
 </template>
 

@@ -1,8 +1,7 @@
-import { EventTypes } from "@/model/EventType";
 import records from "@/utils/records";
 import _ from "lodash-es";
 
-export default class ExportService {
+export class EventService {
   readonly host: URL;
 
   constructor(host: URL) {
