@@ -20,5 +20,10 @@ export default {
   flex-direction: column;
   gap: 20px;
   min-height: 100px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--vt-c-black);
+  padding-bottom: 20px;
 }
 </style>
