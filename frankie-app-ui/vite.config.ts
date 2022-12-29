@@ -17,5 +17,6 @@ export default defineConfig({
     environment: "jsdom",
     root: "src/",
     clearMocks: true,
+    setupFiles: "./src/mocks/setup.ts",
   },
 });

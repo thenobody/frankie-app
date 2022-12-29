@@ -1,5 +1,6 @@
 import records from "@/utils/records";
 import _ from "lodash-es";
+import fetch from "cross-fetch";
 
 export class EventService {
   readonly host: URL;
