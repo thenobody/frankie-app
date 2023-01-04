@@ -81,12 +81,10 @@ export class EventService {
     timestamp: number,
     originalTimestamp: number
   ): Promise<void> {
-    console.log("TODO updateEventTimestamp");
-    // records.setLog([]);
-    records.log.shift();
-    records.log.push({ kind: "oof", time: timestamp });
-    // records.log[0].time = timestamp;
-    // records.log[0].kind = "timestamp";
+    console.log(`TODO updateEventTimestamp`);
+    console.log(`kind: ${kind}`)  
+    console.log(`timestamp: ${timestamp}`)
+    console.log(`originalTimestamp: ${originalTimestamp}`)
     // await this.updateRecords();
   }
 
