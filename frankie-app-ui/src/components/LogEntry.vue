@@ -26,7 +26,7 @@ export default {
     },
   },
   created() {
-    this.value = format(this.time, config.shortDateFormat);
+    this.value = this.formatted();
   },
   computed: {
     parsed() {
@@ -38,7 +38,7 @@ export default {
     },
     error() {
       return !isValid(this.parsed);
-    }
+    },
   },
   inject: {
     eventService: {
@@ -46,30 +46,34 @@ export default {
     },
   },
   methods: {
+    formatted() {
+      return format(this.time, config.shortDateFormat);
+    },
     handleFocus() {
       this.focused = true;
     },
 
-    handleEnter(e: Event): void {
-      const target = e.target as HTMLInputElement;
+    async handleEnter(e: KeyboardEvent): Promise<void> {
       if (this.error) {
         return;
       }
-      target.blur();
+      await this.submit();
+
+      this.handleBlur(e);
     },
 
-    async handleBlur(e: Event): Promise<void> {
-      console.log("blur")
+    handleBlur(e: Event): Promise<void> {
       const target = e.target as HTMLInputElement;
-      if (this.error) {
-        target.focus();
+      if (e.type !== "blur") {
+        target.blur();
+        return;
       }
 
-      await this.submit();
+      this.value = this.formatted();
       this.focused = false;
     },
 
-    async submit(e: Event): Promise<void> {
+    async submit(): Promise<void> {
       await this.eventService.updateEventTimestamp(
         this.kind,
         this.parsed.getTime(),
@@ -81,11 +85,18 @@ export default {
 </script>
 
 <template>
-  {{ kind }}
-  <span class="time-input" :class="{ error: error, focused: focused }">
+  {{ kind
+  }}<span class="time-input" :class="{ error: error, focused: focused }">
     <label>@</label>
-    <input v-model="value" @focus="handleFocus" @blur="handleBlur" @keyup.enter="handleEnter" name="timestamp"
-      :class="{ error: error }" />
+    <input
+      v-model="value"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      @keyup.enter="handleEnter"
+      @keyup.esc="handleBlur"
+      name="timestamp"
+      :class="{ error: error }"
+    />
   </span>
   <span class="error-message" v-if="error">Invalid time!</span>
 </template>
@@ -97,12 +108,23 @@ export default {
   display: inline-flex;
 
   padding: 5px 5px;
-  width: 100px;
+  width: 110px;
 }
 
-.time-input:hover,
+.time-input:hover {
+  border-color: var(--color-border-hover);
+}
+
 .time-input.focused {
   border-color: var(--color-border-selected);
+}
+
+.time-input.focused label {
+  color: var(--color-text);
+}
+
+.time-input label {
+  color: var(--color-text-secondary);
 }
 
 input {

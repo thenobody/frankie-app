@@ -19,6 +19,7 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  --vt-c-text-dark-3: rgba(235, 235, 235, 0.28);
 
   --vt-c-green: #4a7946;
   --vt-c-red: #a70e0e;
@@ -38,6 +39,7 @@
 
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
+  --color-text-secondary: var(--vt-c-text-light-2);
   --color-action: var(--vt-c-green);
   --color-error: var(--vt-c-red);
 
@@ -56,6 +58,7 @@
 
     --color-heading: var(--vt-c-text-dark-1);
     --color-text: var(--vt-c-text-dark-2);
+    --color-text-secondary: var(--vt-c-text-dark-3);
     --color-action: var(--vt-c-green);
     --color-error: var(--vt-c-red);
   }

@@ -78,14 +78,18 @@ export class EventService {
 
   async updateEventTimestamp(
     kind: EventKind,
-    timestamp: number,
-    originalTimestamp: number
+    newTimestamp: number,
+    oldTimestamp: number
   ): Promise<void> {
-    console.log(`TODO updateEventTimestamp`);
-    console.log(`kind: ${kind}`)  
-    console.log(`timestamp: ${timestamp}`)
-    console.log(`originalTimestamp: ${originalTimestamp}`)
-    // await this.updateRecords();
+    const payload = { timestamp: newTimestamp };
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    };
+
+    await fetch(this.host + `events/${kind}/${oldTimestamp}`, requestOptions);
+    await this.updateRecords();
   }
 
   async updateRecords(): Promise<void> {
@@ -94,7 +98,7 @@ export class EventService {
       records.setMostRecent(kind, mostRecent)
     );
     const counts = await this.getCounts(records.currentTime);
-    counts.forEach(({ kind, count }) => records.setCount(kind, count));
+    records.setCounts(counts);
 
     const log = await this.getLog(records.logLimit, records.currentTime);
     records.setLog(log);

@@ -45,7 +45,6 @@ export default {
 
 .count .mostRecent {
   display: none;
-  opacity: 0;
 }
 
 @media (pointer: fine) {
@@ -55,13 +54,13 @@ export default {
 
   .count:hover .mostRecent {
     display: inline;
-    opacity: 0.5;
+    color: var(--color-text-secondary);
   }
 }
 
 .count.touched {
   border-color: var(--color-border-hover);
-  background-color: #242424;
+  background-color: var(--color-background-mute);
   width: 110px;
   position: absolute;
   top: -60px;
@@ -71,6 +70,6 @@ export default {
 
 .count.touched .mostRecent {
   display: inline;
-  opacity: 0.5;
+  color: var(--color-text-secondary);
 }
 </style>

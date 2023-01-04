@@ -20,7 +20,7 @@ export default {
         count: number;
         mostRecent: string;
       }[] = [];
-      records.counts.forEach((count: number, kind: EventKind) => {
+      records.counts.forEach(({ kind, count }) => {
         if (count > 0)
           result.push({
             eventType: getEventTypeByKind(kind)!,

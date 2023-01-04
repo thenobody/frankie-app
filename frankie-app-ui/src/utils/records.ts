@@ -3,7 +3,7 @@ import { reactive } from "vue";
 
 export default reactive({
   mostRecents: new Map<EventKind, number>(),
-  counts: new Map<EventKind, number>(),
+  counts: [] as { kind: EventKind; count: number }[],
   log: [] as { kind: EventKind; time: number }[],
   logLimit: undefined as number | undefined,
   currentTime: undefined as number | undefined,
@@ -12,8 +12,8 @@ export default reactive({
     this.mostRecents.set(kind, mostRecent);
   },
 
-  setCount(kind: EventKind, count: number): void {
-    this.counts.set(kind, count);
+  setCounts(counts: { kind: EventKind; count: number }[]): void {
+    this.counts = counts;
   },
 
   setLog(log: { kind: EventKind; time: number }[]): void {
