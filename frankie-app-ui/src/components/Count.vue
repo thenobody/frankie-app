@@ -39,30 +39,28 @@ export default {
 
 <style scoped>
 .count {
-  border: 1px solid #202020;
-  border-radius: 5px;
+  border: 1px solid var(--color-border);
   padding: 5px 10px;
 }
 
 .count .mostRecent {
   display: none;
-  opacity: 0;
 }
 
 @media (pointer: fine) {
   .count:hover {
-    border-color: #ababab;
+    border-color: var(--color-border-hover);
   }
 
   .count:hover .mostRecent {
     display: inline;
-    opacity: 0.5;
+    color: var(--color-text-secondary);
   }
 }
 
 .count.touched {
-  border-color: #ababab;
-  background-color: #242424;
+  border-color: var(--color-border-hover);
+  background-color: var(--color-background-mute);
   width: 110px;
   position: absolute;
   top: -60px;
@@ -72,6 +70,6 @@ export default {
 
 .count.touched .mostRecent {
   display: inline;
-  opacity: 0.5;
+  color: var(--color-text-secondary);
 }
 </style>

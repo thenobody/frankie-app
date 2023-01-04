@@ -22,8 +22,9 @@ export default {
   min-height: 100px;
   position: sticky;
   top: 0;
-  z-index: 1;
-  background-color: var(--vt-c-black);
+  z-index: 2;
+  background-color: var(--color-background);
   padding-bottom: 20px;
+  border-radius: 0;
 }
 </style>

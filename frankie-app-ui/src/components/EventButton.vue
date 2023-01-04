@@ -94,10 +94,9 @@ export default {
 .event-button {
   border: 1px solid v-bind(color);
   border-radius: 5px;
-  background-color: #202020;
+  background-color: var(--color-background-soft);
   width: 200px;
   height: 200px;
-  color: v-bind(color);
   cursor: pointer;
   font-size: 1.2em;
   display: flex;
@@ -118,10 +117,10 @@ export default {
   margin-top: auto;
   opacity: 0;
   background-color: transparent;
-  border: 1px solid #4a7946;
-  color: #4a7946;
+  border: 1px solid var(--color-action);
+  color: var(--color-action);
   border-radius: 5px;
-  z-index: 10;
+  z-index: 1;
 }
 
 @media (max-width: 500px) {
@@ -136,7 +135,7 @@ export default {
   }
 
   .event-button.selected {
-    background-color: #404040;
+    background-color: var(--color-background-mute);
   }
 
   .event-button .undo.selected {
@@ -147,7 +146,7 @@ export default {
 
 @media (pointer: fine) {
   .event-button:hover {
-    background-color: #404040;
+    background-color: var(--color-background-mute);
   }
 
   .event-button:hover .undo {

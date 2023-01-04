@@ -10,6 +10,7 @@ import {
 export interface Service {
   getLog(
     limit?: number,
+    offset?: number,
     after?: number
   ): Promise<{ kind: string; time: number }[]>;
   dropAll(): Promise<void>;
@@ -19,6 +20,11 @@ export interface Service {
   getCount(kind: string, after?: number): Promise<number>;
   addMostRecent(kind: string): Promise<void>;
   dropMostRecent(kind: string): Promise<void>;
+  updateEventTimestamp(
+    kind: string,
+    oldTimestamp: number,
+    newtTimestamp: number
+  ): Promise<void>;
 }
 
 export class RedisService implements Service {
@@ -39,17 +45,31 @@ export class RedisService implements Service {
     this.client.connect();
   }
 
-  private async addLogEntry(kind: string, time: number): Promise<void> {
-    await this.client.lPush(this.keys.log, [time.toString(), kind]);
+  private buildLogEntry(
+    kind: string,
+    time: number
+  ): { score: number; value: string } {
+    return {
+      score: time,
+      value: `${kind}-${time.toString()}`,
+    };
   }
 
-  private async dropLogEntry(kind: string): Promise<void> {
-    const index = await this.client.lPos(this.keys.log, kind);
-    const transaction = this.client.multi();
-    await this.client.lSet(this.keys.log, index, "DELETE");
-    await this.client.lSet(this.keys.log, index + 1, "DELETE");
-    await this.client.lRem(this.keys.log, 0, "DELETE");
-    await transaction.exec();
+  private parseLogEntry(entry: string): { kind: string; time: number } {
+    const [kind, time] = entry.split("-");
+    return {
+      kind: kind,
+      time: parseInt(time),
+    };
+  }
+
+  private async addLogEntry(kind: string, time: number): Promise<void> {
+    await this.client.zAdd(this.keys.log, this.buildLogEntry(kind, time));
+  }
+
+  private async dropLogEntry(kind: string, time: number): Promise<void> {
+    const { value } = this.buildLogEntry(kind, time);
+    await this.client.zRem(this.keys.log, value);
   }
 
   private async getKinds(): Promise<string[]> {
@@ -59,24 +79,24 @@ export class RedisService implements Service {
 
   async getLog(
     limit?: number,
+    offset?: number,
     after?: number
   ): Promise<{ kind: string; time: number }[]> {
-    const range = limit * 2 - 1 || -1;
-    const entries = await this.client.lRange(this.keys.log, 0, range);
-    const result: { kind: string; time: number }[] = [];
-    for (let i = 0; i < entries.length; i = i + 2) {
-      const entry = {
-        kind: entries[i],
-        time: parseInt(entries[i + 1]),
-      };
-      if (typeof after !== "undefined") {
-        if (entry.time >= after) result.push(entry);
-      } else {
-        result.push(entry);
+    const entries = await this.client.zRange(
+      this.keys.log,
+      "+inf",
+      after ?? "-inf",
+      {
+        REV: true,
+        BY: "SCORE",
+        LIMIT: {
+          offset: offset ?? 0,
+          count: limit ?? -1,
+        },
       }
-    }
+    );
 
-    return result;
+    return _.map(entries, this.parseLogEntry);
   }
 
   async dropAll(): Promise<void> {
@@ -115,16 +135,37 @@ export class RedisService implements Service {
   }
 
   async addMostRecent(kind: string): Promise<void> {
-    const time = _.now();
-    await this.client.zAdd(this.keys.kind(kind), {
-      score: time,
-      value: time.toString(),
-    });
-    await this.addLogEntry(kind, time);
+    const timestamp = _.now();
+    await this.addKindEvent(kind, timestamp);
+    await this.addLogEntry(kind, timestamp);
   }
 
   async dropMostRecent(kind: string): Promise<void> {
-    await this.client.zPopMax(this.keys.kind(kind));
-    await this.dropLogEntry(kind);
+    const entry = await this.client.zPopMax(this.keys.kind(kind));
+    if (entry) {
+      await this.dropLogEntry(kind, entry.score);
+    }
+  }
+
+  private async addKindEvent(kind: string, timestamp: number): Promise<void> {
+    await this.client.zAdd(this.keys.kind(kind), {
+      score: timestamp,
+      value: timestamp.toString(),
+    });
+  }
+
+  private async dropKindEvent(kind: string, timestamp: number): Promise<void> {
+    await this.client.zRem(this.keys.kind(kind), timestamp.toString());
+  }
+
+  async updateEventTimestamp(
+    kind: string,
+    oldTimestamp: number,
+    newTimestamp: number
+  ): Promise<void> {
+    await this.dropLogEntry(kind, oldTimestamp);
+    await this.addLogEntry(kind, newTimestamp);
+    await this.dropKindEvent(kind, oldTimestamp);
+    await this.addKindEvent(kind, newTimestamp);
   }
 }

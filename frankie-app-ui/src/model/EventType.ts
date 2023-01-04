@@ -1,5 +1,15 @@
+export type EventKind =
+  | "pee"
+  | "poo"
+  | "food"
+  | "water"
+  | "cooper"
+  | "training"
+  | "wakeup"
+  | "sleep";
+
 export interface EventType {
-  readonly kind: string;
+  readonly kind: EventKind;
   readonly label: string;
   readonly icon: string;
 }
