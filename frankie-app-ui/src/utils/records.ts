@@ -1,21 +1,22 @@
-import { reactive, toHandlers } from "vue";
+import type { EventKind } from "@/model/EventType";
+import { reactive } from "vue";
 
 export default reactive({
-  mostRecents: new Map<string, number>(),
-  counts: new Map<string, number>(),
-  log: [] as { kind: string; time: number }[],
+  mostRecents: new Map<EventKind, number>(),
+  counts: new Map<EventKind, number>(),
+  log: [] as { kind: EventKind; time: number }[],
   logLimit: undefined as number | undefined,
-  after: undefined as number | undefined,
+  currentTime: undefined as number | undefined,
 
-  setMostRecent(kind: string, mostRecent: number): void {
+  setMostRecent(kind: EventKind, mostRecent: number): void {
     this.mostRecents.set(kind, mostRecent);
   },
 
-  setCount(kind: string, count: number): void {
+  setCount(kind: EventKind, count: number): void {
     this.counts.set(kind, count);
   },
 
-  setLog(log: { kind: string; time: number }[]): void {
+  setLog(log: { kind: EventKind; time: number }[]): void {
     this.log = log;
   },
 
@@ -23,7 +24,7 @@ export default reactive({
     this.logLimit = limit;
   },
 
-  setAfter(after?: number): void {
-    this.after = after;
+  setCurrentTime(after?: number): void {
+    this.currentTime = after;
   },
 });

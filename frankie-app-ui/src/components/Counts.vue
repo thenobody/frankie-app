@@ -1,6 +1,10 @@
 <script lang="ts">
 import Count from "@/components/Count.vue";
-import { getEventTypeByKind, type EventType } from "@/model/EventType";
+import {
+  getEventTypeByKind,
+  type EventKind,
+  type EventType,
+} from "@/model/EventType";
 import records from "@/utils/records";
 import { format } from "date-fns";
 import config from "@/config";
@@ -16,7 +20,7 @@ export default {
         count: number;
         mostRecent: string;
       }[] = [];
-      records.counts.forEach((count: number, kind: string) => {
+      records.counts.forEach((count: number, kind: EventKind) => {
         if (count > 0)
           result.push({
             eventType: getEventTypeByKind(kind)!,

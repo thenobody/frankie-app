@@ -3,6 +3,9 @@ import { EventServiceKey } from "@/InjectionKeys";
 import records from "@/utils/records";
 import { format } from "date-fns";
 import config from "@/config";
+import LogEntry from "./LogEntry.vue";
+import type { EventKind } from "@/model/EventType";
+import { entries } from "lodash";
 
 export default {
   props: {
@@ -15,16 +18,12 @@ export default {
   created() {
     records.setLogLimit(this.limit);
   },
+  components: {
+    LogEntry,
+  },
   computed: {
-    entries(): { kind: string; timestamp: string }[] {
-      const result: { kind: string; timestamp: string }[] = [];
-      records.log.forEach(({ kind, time }) => {
-        result.push({
-          kind: kind,
-          timestamp: format(time, config.shortDateFormat),
-        });
-      });
-      return result;
+    entries(): { kind: EventKind; time: number }[] {
+      return records.log;
     },
   },
 };
@@ -34,10 +33,11 @@ export default {
   <div id="log">
     <h2>Most recent:</h2>
     <ul id="log">
-      <li v-for="{ kind, timestamp } in entries">
-        {{ kind }} @ {{ timestamp }}
+      <li v-for="{ kind, time } in entries" :key="time">
+        <LogEntry :kind="kind" :time="time" />
       </li>
     </ul>
+    <button class="load-more">Load more</button>
   </div>
 </template>
 
@@ -58,9 +58,24 @@ ul {
   padding: 0;
 }
 
-li {
-  border: 1px solid #484848;
+li,
+.load-more {
+  border: 1px solid var(--color-border);
   border-radius: 5px;
   padding: 5px 10px;
+}
+
+.load-more {
+  padding: 10px 10px;
+  color: var(--color-text);
+  font-size: var(--font-size-normal);
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+}
+
+.load-more:hover {
+  cursor: pointer;
+  border: 1px solid var(--color-border-hover);
+  background-color: var(--color-background-mute);
 }
 </style>

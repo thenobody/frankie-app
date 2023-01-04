@@ -39,8 +39,7 @@ export default {
 
 <style scoped>
 .count {
-  border: 1px solid #202020;
-  border-radius: 5px;
+  border: 1px solid var(--color-border);
   padding: 5px 10px;
 }
 
@@ -51,7 +50,7 @@ export default {
 
 @media (pointer: fine) {
   .count:hover {
-    border-color: #ababab;
+    border-color: var(--color-border-hover);
   }
 
   .count:hover .mostRecent {
@@ -61,7 +60,7 @@ export default {
 }
 
 .count.touched {
-  border-color: #ababab;
+  border-color: var(--color-border-hover);
   background-color: #242424;
   width: 110px;
   position: absolute;

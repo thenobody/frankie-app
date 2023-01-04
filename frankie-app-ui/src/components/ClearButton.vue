@@ -18,7 +18,6 @@ export default {
 <style scoped>
 .event-button {
   border: 1px solid red;
-  border-radius: 5px;
   background-color: #202020;
   width: 200px;
   height: 200px;

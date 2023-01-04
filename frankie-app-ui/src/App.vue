@@ -1,6 +1,7 @@
 <script lang="ts">
 import EventButtons from "./components/EventButtons.vue";
 import Log from "./components/Log.vue";
+import SideMenu from "./components/SideMenu.vue";
 import Stats from "./components/Stats.vue";
 import { EventServiceKey, PropertyWindowIsScrollingKey } from "./InjectionKeys";
 import records from "./utils/records";
@@ -30,11 +31,12 @@ export default {
   components: {
     EventButtons,
     Log,
+    SideMenu,
     Stats,
   },
   methods: {
     keepUpdating(): void {
-      records.setAfter(startOfDay(_.now()).valueOf());
+      records.setCurrentTime(startOfDay(_.now()).valueOf());
       this.eventService.updateRecords();
       _.delay(this.keepUpdating, this.configMap.apiPollIntervalSec * 1000);
     },
@@ -54,6 +56,9 @@ export default {
 </script>
 
 <template>
+  <nav>
+    <SideMenu />
+  </nav>
   <main>
     <Log :limit="configMap.logEntryCount" />
     <Stats />
@@ -66,5 +71,11 @@ main {
   display: flex;
   flex-direction: column;
   gap: 40px;
+
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  font-weight: normal;
 }
 </style>

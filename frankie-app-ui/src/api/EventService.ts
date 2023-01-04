@@ -1,6 +1,7 @@
 import records from "@/utils/records";
 import _ from "lodash-es";
 import fetch from "cross-fetch";
+import type { EventKind } from "@/model/EventType";
 
 export class EventService {
   readonly host: URL;
@@ -12,7 +13,7 @@ export class EventService {
   async getLog(
     limit?: number,
     after?: number
-  ): Promise<{ kind: string; time: number }[]> {
+  ): Promise<{ kind: EventKind; time: number }[]> {
     const query = new URLSearchParams();
     if (typeof limit !== "undefined") {
       query.set("limit", limit.toString());
@@ -25,18 +26,20 @@ export class EventService {
     url.search = query.toString();
     return await fetch(url)
       .then((res) => res.json())
-      .then(({ log }) => log as { kind: string; time: number }[]);
+      .then(({ log }) => log as { kind: EventKind; time: number }[]);
   }
 
-  async getMostRecent(): Promise<{ kind: string; mostRecent: number }[]> {
+  async getMostRecent(): Promise<{ kind: EventKind; mostRecent: number }[]> {
     const res = await fetch(this.host + "events/most-recent");
     const { mostRecents } = (await res.json()) as {
-      mostRecents: { kind: string; mostRecent: number }[];
+      mostRecents: { kind: EventKind; mostRecent: number }[];
     };
     return mostRecents;
   }
 
-  async getCounts(after?: number): Promise<{ kind: string; count: number }[]> {
+  async getCounts(
+    after?: number
+  ): Promise<{ kind: EventKind; count: number }[]> {
     const query = new URLSearchParams();
     if (typeof after !== "undefined") {
       query.set("after", after.toString());
@@ -47,12 +50,12 @@ export class EventService {
 
     const res = await fetch(url);
     const { counts } = (await res.json()) as {
-      counts: { kind: string; count: number }[];
+      counts: { kind: EventKind; count: number }[];
     };
     return counts;
   }
 
-  async addMostRecent(kind: string, time: number = _.now()): Promise<void> {
+  async addMostRecent(kind: EventKind, time: number = _.now()): Promise<void> {
     const payload = { mostRecent: time };
     const requestOptions = {
       method: "POST",
@@ -64,7 +67,7 @@ export class EventService {
     await this.updateRecords();
   }
 
-  async dropMostRecent(kind: string): Promise<void> {
+  async dropMostRecent(kind: EventKind): Promise<void> {
     const requestOptions = {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -73,15 +76,29 @@ export class EventService {
     await this.updateRecords();
   }
 
+  async updateEventTimestamp(
+    kind: EventKind,
+    timestamp: number,
+    originalTimestamp: number
+  ): Promise<void> {
+    console.log("TODO updateEventTimestamp");
+    // records.setLog([]);
+    records.log.shift();
+    records.log.push({ kind: "oof", time: timestamp });
+    // records.log[0].time = timestamp;
+    // records.log[0].kind = "timestamp";
+    // await this.updateRecords();
+  }
+
   async updateRecords(): Promise<void> {
     const mostRecents = await this.getMostRecent();
     mostRecents.forEach(({ kind, mostRecent }) =>
       records.setMostRecent(kind, mostRecent)
     );
-    const counts = await this.getCounts(records.after);
+    const counts = await this.getCounts(records.currentTime);
     counts.forEach(({ kind, count }) => records.setCount(kind, count));
 
-    const log = await this.getLog(records.logLimit, records.after);
+    const log = await this.getLog(records.logLimit, records.currentTime);
     records.setLog(log);
   }
 }

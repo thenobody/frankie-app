@@ -11,4 +11,5 @@ app.config.unwrapInjectedRef = true;
 
 app
   .provide(EventServiceKey, new EventService(new URL(config.apiBaseUrl)))
-  .mount("#app");
+  .mount("body");
+// .mount("#app");
