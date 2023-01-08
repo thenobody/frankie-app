@@ -11,8 +11,8 @@ export class EventService {
   }
 
   async getLog(
-    limit?: number,
-    after?: number
+    after?: number,
+    limit?: number
   ): Promise<{ kind: EventKind; time: number }[]> {
     const query = new URLSearchParams();
     if (typeof limit !== "undefined") {
@@ -55,7 +55,7 @@ export class EventService {
     return counts;
   }
 
-  async addMostRecent(kind: EventKind, time: number = _.now()): Promise<void> {
+  async addMostRecent(kind: EventKind, time: number): Promise<void> {
     const payload = { mostRecent: time };
     const requestOptions = {
       method: "POST",
@@ -97,10 +97,10 @@ export class EventService {
     mostRecents.forEach(({ kind, mostRecent }) =>
       records.setMostRecent(kind, mostRecent)
     );
-    const counts = await this.getCounts(records.currentTime);
+    const counts = await this.getCounts(records.currentDateStart);
     records.setCounts(counts);
 
-    const log = await this.getLog(records.logLimit, records.currentTime);
+    const log = await this.getLog(records.currentDateStart);
     records.setLog(log);
   }
 }

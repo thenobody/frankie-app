@@ -1,13 +1,8 @@
 <script lang="ts">
 import Count from "@/components/Count.vue";
-import {
-  getEventTypeByKind,
-  type EventKind,
-  type EventType,
-} from "@/model/EventType";
+import { getEventTypeByKind, type EventType } from "@/model/EventType";
+import { formatShortTime } from "@/utils/date";
 import records from "@/utils/records";
-import { format } from "date-fns";
-import config from "@/config";
 
 export default {
   components: {
@@ -25,10 +20,7 @@ export default {
           result.push({
             eventType: getEventTypeByKind(kind)!,
             count: count,
-            mostRecent: format(
-              records.mostRecents.get(kind)!,
-              config.shortDateFormat
-            ),
+            mostRecent: formatShortTime(records.mostRecents.get(kind)!),
           });
       });
       return result;

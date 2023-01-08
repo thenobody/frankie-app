@@ -1,8 +1,6 @@
 <script lang="ts">
 import { EventServiceKey } from "@/InjectionKeys";
 import records from "@/utils/records";
-import { format } from "date-fns";
-import config from "@/config";
 import LogEntry from "./LogEntry.vue";
 import type { EventKind } from "@/model/EventType";
 import { entries } from "lodash";
@@ -10,6 +8,7 @@ import { entries } from "lodash";
 export default {
   data() {
     return {
+      count: 0,
       collapsible: false,
     };
   },
@@ -21,25 +20,23 @@ export default {
     },
   },
   created() {
-    records.setLogLimit(this.limit);
+    this.count = this.limit;
   },
   components: {
     LogEntry,
   },
   computed: {
     entries(): { kind: EventKind; time: number }[] {
-      return records.log;
+      return records.log.slice(0, this.count);
     },
   },
   methods: {
     async handleLoadMoreClick() {
-      records.setLogLimit((records.logLimit ?? 0) + this.limit);
-      await this.eventService.updateRecords();
+      this.count += this.limit;
       this.collapsible = true;
     },
     async handleCollapseClick() {
-      records.setLogLimit(this.limit);
-      await this.eventService.updateRecords();
+      this.count = this.limit;
       this.collapsible = false;
     },
   },

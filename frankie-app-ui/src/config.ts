@@ -3,5 +3,5 @@ export default {
   apiPollIntervalSec: 30,
   windowScrollCheckMillis: 250,
   logEntryCount: 5,
-  shortDateFormat: "p",
+  shortTimeFormat: "p",
 };

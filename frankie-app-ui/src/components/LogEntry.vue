@@ -1,10 +1,11 @@
 <script lang="ts">
 import type { EventKind } from "@/model/EventType";
 import type { PropType } from "vue";
-import format from "date-fns/format";
 import isValid from "date-fns/isValid";
+import formatDistance from "date-fns/formatDistanceStrict";
 import parse from "date-fns/parse";
 import config from "@/config";
+import { formatShortTime } from "@/utils/date";
 import records from "@/utils/records";
 import { EventServiceKey } from "@/InjectionKeys";
 
@@ -29,14 +30,19 @@ export default {
     this.value = this.formatted();
   },
   computed: {
-    parsed() {
+    parsed(): Date {
       return parse(
         this.value,
-        config.shortDateFormat,
-        new Date(records.currentTime!)
+        config.shortTimeFormat,
+        new Date(records.currentDateStart)
       );
     },
-    error() {
+    distance(): string {
+      return formatDistance(this.time, records.currentTime, {
+        addSuffix: true,
+      });
+    },
+    error(): boolean {
       return !isValid(this.parsed);
     },
   },
@@ -47,7 +53,7 @@ export default {
   },
   methods: {
     formatted() {
-      return format(this.time, config.shortDateFormat);
+      return formatShortTime(this.time);
     },
     handleFocus() {
       this.focused = true;
@@ -62,7 +68,7 @@ export default {
       this.handleBlur(e);
     },
 
-    handleBlur(e: Event): Promise<void> {
+    handleBlur(e: Event): void {
       const target = e.target as HTMLInputElement;
       if (e.type !== "blur") {
         target.blur();
@@ -85,8 +91,8 @@ export default {
 </script>
 
 <template>
-  {{ kind
-  }}<span class="time-input" :class="{ error: error, focused: focused }">
+  {{ kind }}<span class="distance">{{ distance }}</span>
+  <span class="time-input" :class="{ error: error, focused: focused }">
     <label>@</label>
     <input
       v-model="value"
@@ -107,7 +113,8 @@ export default {
   border: 1px solid transparent;
   display: inline-flex;
 
-  padding: 5px 5px;
+  padding: 5px 0.25ch;
+  margin-left: 0.25ch;
   width: 110px;
 }
 
@@ -117,13 +124,20 @@ export default {
 
 .time-input.focused {
   border-color: var(--color-border-selected);
+  color: var(--color-text);
 }
 
 .time-input.focused label {
   color: var(--color-text);
 }
 
-.time-input label {
+.distance {
+  margin-left: 0.5ch;
+}
+
+.time-input label,
+.distance,
+input {
   color: var(--color-text-secondary);
 }
 
@@ -133,12 +147,12 @@ input {
   box-sizing: border-box;
 
   font-size: 15px;
-  color: var(--color-text);
   width: 100%;
 }
 
 input:focus {
   outline: none;
+  color: var(--color-text);
 }
 
 .error,

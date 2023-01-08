@@ -3,6 +3,7 @@ import EventButtons from "./components/EventButtons.vue";
 import Log from "./components/Log.vue";
 import SideMenu from "./components/SideMenu.vue";
 import Stats from "./components/Stats.vue";
+import Times from "./components/Times.vue";
 import { EventServiceKey, PropertyWindowIsScrollingKey } from "./InjectionKeys";
 import records from "./utils/records";
 import _ from "lodash-es";
@@ -33,12 +34,21 @@ export default {
     Log,
     SideMenu,
     Stats,
+    Times,
   },
   methods: {
     keepUpdating(): void {
-      records.setCurrentTime(startOfDay(_.now()).valueOf());
+      this.keepUpdatingTime();
+      this.keepUpdatingLogs();
+    },
+    keepUpdatingTime(): void {
+      records.setCurrentTime(_.now());
+      records.setCurrentDateStart(startOfDay(_.now()).valueOf());
+      _.delay(this.keepUpdatingTime, 1000);
+    },
+    keepUpdatingLogs(): void {
       this.eventService.updateRecords();
-      _.delay(this.keepUpdating, this.configMap.apiPollIntervalSec * 1000);
+      _.delay(this.keepUpdatingLogs, this.configMap.apiPollIntervalSec * 1000);
     },
     watchScrollState(): void {
       ["touchmove", "scroll"].forEach((event) => {
@@ -57,25 +67,32 @@ export default {
 
 <template>
   <nav>
-    <SideMenu />
+    <!-- <SideMenu /> -->
   </nav>
   <main>
-    <Log :limit="configMap.logEntryCount" />
-    <Stats />
+    <header>
+      <Times />
+      <Log :limit="configMap.logEntryCount" />
+      <Stats />
+    </header>
     <EventButtons />
   </main>
 </template>
 
 <style scoped>
-main {
+main,
+header {
   display: flex;
   flex-direction: column;
   gap: 40px;
 
   max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
 
   font-weight: normal;
+}
+
+main {
+  padding: 2rem;
+  margin: 0 auto;
 }
 </style>
