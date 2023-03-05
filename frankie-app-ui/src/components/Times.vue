@@ -54,12 +54,10 @@ export default {
       return result;
     },
     wakingDuration(): string {
-      const { wakingTime } = this.durations;
-      return formatMillis(wakingTime);
+      return formatMillis(this.durations.wakingTime);
     },
     sleepingDuration(): string {
-      const { sleepingTime } = this.durations;
-      return formatMillis(sleepingTime);
+      return formatMillis(this.durations.sleepingTime);
     },
   },
 };
@@ -104,5 +102,11 @@ export default {
 .time .icon {
   position: absolute;
   left: 20px;
+}
+
+@media (max-width: 500px) {
+  .time .icon {
+    left: 10px;
+  }
 }
 </style>

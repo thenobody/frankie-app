@@ -3,7 +3,6 @@ import { EventServiceKey } from "@/InjectionKeys";
 import records from "@/utils/records";
 import LogEntry from "./LogEntry.vue";
 import type { EventKind } from "@/model/EventType";
-import { entries } from "lodash";
 
 export default {
   data() {

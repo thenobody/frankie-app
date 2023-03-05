@@ -55,31 +55,41 @@ export default {
     formatted() {
       return formatShortTime(this.time);
     },
+
     handleFocus() {
       this.focused = true;
     },
 
-    async handleEnter(e: KeyboardEvent): Promise<void> {
-      if (this.error) {
-        return;
-      }
-      await this.submit();
-
-      this.handleBlur(e);
+    handleEnter(e: KeyboardEvent): void {
+      const target = e.target as HTMLInputElement;
+      target.blur();
     },
 
-    handleBlur(e: Event): void {
-      const target = e.target as HTMLInputElement;
-      if (e.type !== "blur") {
-        target.blur();
-        return;
-      }
-
-      this.value = this.formatted();
+    handleEscape(e: KeyboardEvent): void {
       this.focused = false;
+      this.value = this.formatted();
+      const target = e.target as HTMLInputElement;
+      target.blur();
+    },
+
+    async handleBlur(e: Event): Promise<void> {
+      if (this.focused) {
+        const target = e.target as HTMLInputElement;
+        await this.submit();
+        this.focused = false;
+      }
+    },
+
+    handleInput(e: Event): void {
+      if (!this.value) {
+        this.value = this.formatted();
+      }
     },
 
     async submit(): Promise<void> {
+      if (this.error) {
+        return;
+      }
       await this.eventService.updateEventTimestamp(
         this.kind,
         this.parsed.getTime(),
@@ -99,8 +109,11 @@ export default {
       @focus="handleFocus"
       @blur="handleBlur"
       @keyup.enter="handleEnter"
-      @keyup.esc="handleBlur"
+      @keyup.esc="handleEscape"
+      @input="handleInput"
       name="timestamp"
+      type="time"
+      required
       :class="{ error: error }"
     />
   </span>
@@ -145,7 +158,9 @@ input {
   background-color: transparent;
   border: none;
   box-sizing: border-box;
-
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   font-size: 15px;
   width: 100%;
 }
@@ -155,6 +170,7 @@ input:focus {
   color: var(--color-text);
 }
 
+.time-input input:invalid,
 .error,
 .error-message {
   color: var(--color-error);

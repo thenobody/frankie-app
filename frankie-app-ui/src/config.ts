@@ -1,7 +1,7 @@
 export default {
-  apiBaseUrl: "http://vancos-imac.local:3000",
+  apiBaseUrl: "https://puppy.nobody.directory:8080/api/",
   apiPollIntervalSec: 30,
   windowScrollCheckMillis: 250,
   logEntryCount: 5,
-  shortTimeFormat: "p",
+  shortTimeFormat: "HH:mm",
 };

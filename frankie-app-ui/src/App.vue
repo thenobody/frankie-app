@@ -70,11 +70,9 @@ export default {
     <!-- <SideMenu /> -->
   </nav>
   <main>
-    <header>
-      <Times />
-      <Log :limit="configMap.logEntryCount" />
-      <Stats />
-    </header>
+    <Times />
+    <Log :limit="configMap.logEntryCount" />
+    <Stats />
     <EventButtons />
   </main>
 </template>
