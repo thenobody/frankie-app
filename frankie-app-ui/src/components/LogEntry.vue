@@ -128,7 +128,6 @@ export default {
 
   padding: 5px 0.25ch;
   margin-left: 0.25ch;
-  width: 110px;
 }
 
 .time-input:hover {
@@ -158,11 +157,13 @@ input {
   background-color: transparent;
   border: none;
   box-sizing: border-box;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: var(--font-family);
   font-size: 15px;
   width: 100%;
+}
+
+input::-webkit-calendar-picker-indicator {
+  display: none;
 }
 
 input:focus {
